@@ -1,8 +1,8 @@
 const fs = require('fs');
-const REDIRECTS = { './': './index.html' };
+const REDIRECTS = { './public_html/': './public_html/index.html' };
 
 const resolveRequestedFile = function(url) {
-  let requestedFile = `.${url}`;
+  let requestedFile = `./public_html${url}`;
   return REDIRECTS[requestedFile] || requestedFile;
 };
 
