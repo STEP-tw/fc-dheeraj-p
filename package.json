@@ -1,15 +1,27 @@
 {
   "name": "flower_catalog",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "A flower catalog web app",
   "main": "server.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "node server.js"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Dheeraj",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/STEP-tw/fc-dheeraj-p.git"
+  },
+  "bugs": {
+    "url": "https://github.com/STEP-tw/fc-dheeraj-p/issues"
+  },
+  "homepage": "https://github.com/STEP-tw/fc-dheeraj-p#readme",
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.9"
+  }
 }
