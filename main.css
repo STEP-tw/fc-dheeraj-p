@@ -1,0 +1,15 @@
+.title {
+  text-align: right;
+  margin-right: 30px;
+}
+
+.line {
+  background: black;
+  height: 1px;
+  width: 100%;
+}
+main {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+}
