@@ -1,9 +1,15 @@
 const fs = require('fs');
+const ERROR_404 = '404: File Not Found';
+const ERROR_500 = '500: Internal Server Error';
 const REDIRECTS = { './public_html/': './public_html/index.html' };
 
 const resolveRequestedFile = function(url) {
   let requestedFile = `./public_html${url}`;
   return REDIRECTS[requestedFile] || requestedFile;
+};
+
+const isFileNotFoundError = function(errorCode) {
+  return errorCode == 'ENOENT';
 };
 
 const app = (req, res) => {
@@ -13,11 +19,11 @@ const app = (req, res) => {
       send(res, 200, content);
       return;
     }
-    if (err.code == 'ENOENT') {
-      send(res, 404, '404: File Not Found');
+    if (isFileNotFoundError(err.code)) {
+      send(res, 404, ERROR_404);
       return;
     }
-    send(res, 500, '500: Internal Server Error');
+    send(res, 500, ERROR_500);
   });
 };
 
