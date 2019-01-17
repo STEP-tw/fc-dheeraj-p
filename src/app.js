@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Sheeghra = require('./sheeghra');
-const ERROR_404 = '404: File Not Found';
+const ERROR_404 = '404: Resource Not Found';
 const ERROR_500 = '500: Internal Server Error';
 const REDIRECTS = { './public_html/': './public_html/index.html' };
 
