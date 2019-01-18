@@ -48,7 +48,7 @@ const saveComment = function(comment, req, res) {
     './private/comments.part_json',
     JSON.stringify(comment) + ',',
     err => {
-      if (err) throw err;
+      if (err) return send(res, 500, ERROR_500);
       serveGuestBookPage(req, res);
     }
   );
