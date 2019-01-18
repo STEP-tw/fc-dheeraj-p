@@ -93,8 +93,8 @@ const serveGuestBookPage = function(req, res) {
     const commentsData = JSON.parse('[' + data.slice(0, -1) + ']');
     fs.readFile('private/guest_book.html', (err, data) => {
       if (err) return send(res, 500, ERROR_500);
-
-      const commentsHTML = createCommentsHTML(commentsData);
+      const commentsOrderedByDate = commentsData.reverse();
+      const commentsHTML = createCommentsHTML(commentsOrderedByDate);
       const guestBookPage = data
         .toString()
         .replace(COMMENTS_PLACEHOLDER, commentsHTML);
