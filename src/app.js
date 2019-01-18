@@ -3,10 +3,18 @@ const Sheeghra = require('./sheeghra');
 const ERROR_404 = '404: Resource Not Found';
 const ERROR_500 = '500: Internal Server Error';
 const COMMENTS_PLACEHOLDER = '######COMMENTS_GOES_HERE######';
-const COMMENTS_FILE = './private/comments.part_json';
+const COMMENTS_FILE = './private/comments.json';
 const REDIRECTS = { './public_html/': './public_html/index.html' };
 
 const app = new Sheeghra();
+
+const loadComments = function() {
+  const commentsJSON = fs.readFileSync(COMMENTS_FILE, 'utf-8');
+  return JSON.parse(commentsJSON);
+};
+
+//Server won't be ready until comments get ready
+const comments = loadComments();
 
 const resolveRequestedFile = function(url) {
   let requestedFile = `./public_html${url}`;
@@ -45,8 +53,11 @@ const logRequests = function(req, res, next) {
 };
 
 const saveComment = function(comment, req, res) {
-  fs.appendFile(COMMENTS_FILE, JSON.stringify(comment) + ',', err => {
-    if (err) return send(res, 500, ERROR_500);
+  comments.unshift(comment);
+  fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {
+    if (err) {
+      return send(res, 500, ERROR_500);
+    }
     serveGuestBookPage(req, res);
   });
 };
@@ -82,10 +93,10 @@ const createCommentsHTML = function(commentsData) {
   const commentsHTML = commentsData.map(({ date, name, comment }) => {
     return `<p>${date}: <strong>${name}</strong> : ${comment}</p>`;
   });
-  return commentsHTML.reverse().join('\n');
+  return commentsHTML.join('\n');
 };
 
-const sendGuestBookPage = function(res, comments) {
+const serveGuestBookPage = function(req, res) {
   fs.readFile('private/guest_book.html', (err, data) => {
     if (err) {
       send(res, 500, ERROR_500);
@@ -97,18 +108,6 @@ const sendGuestBookPage = function(res, comments) {
       .replace(COMMENTS_PLACEHOLDER, commentsHTML);
 
     send(res, 200, guestBookPage);
-  });
-};
-
-const serveGuestBookPage = function(req, res) {
-  fs.readFile(COMMENTS_FILE, (err, data) => {
-    if (err) {
-      send(res, 500, ERROR_500);
-      return;
-    }
-    const commentsJSON = '[' + data.slice(0, -1) + ']';
-    const comments = JSON.parse(commentsJSON);
-    sendGuestBookPage(res, comments);
   });
 };
 
