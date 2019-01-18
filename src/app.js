@@ -3,6 +3,7 @@ const Sheeghra = require('./sheeghra');
 const ERROR_404 = '404: Resource Not Found';
 const ERROR_500 = '500: Internal Server Error';
 const COMMENTS_PLACEHOLDER = '######COMMENTS_GOES_HERE######';
+const COMMENTS_FILE = './private/comments.part_json';
 const REDIRECTS = { './public_html/': './public_html/index.html' };
 
 const app = new Sheeghra();
@@ -44,14 +45,10 @@ const logRequests = function(req, res, next) {
 };
 
 const saveComment = function(comment, req, res) {
-  fs.appendFile(
-    './private/comments.part_json',
-    JSON.stringify(comment) + ',',
-    err => {
-      if (err) return send(res, 500, ERROR_500);
-      serveGuestBookPage(req, res);
-    }
-  );
+  fs.appendFile(COMMENTS_FILE, JSON.stringify(comment) + ',', err => {
+    if (err) return send(res, 500, ERROR_500);
+    serveGuestBookPage(req, res);
+  });
 };
 
 const readArgs = text => {
@@ -75,32 +72,43 @@ const readPostBody = (req, res, next) => {
 };
 
 const postComment = function(req, res) {
-  const commentData = readArgs(req.body);
+  const comment = readArgs(req.body);
   const date = new Date().toLocaleString();
-  commentData.date = date;
-  saveComment(commentData, req, res);
+  comment.date = date;
+  saveComment(comment, req, res);
 };
 
 const createCommentsHTML = function(commentsData) {
   const commentsHTML = commentsData.map(({ date, name, comment }) => {
     return `<p>${date}: <strong>${name}</strong> : ${comment}</p>`;
   });
-  return commentsHTML.join('\n');
+  return commentsHTML.reverse().join('\n');
+};
+
+const sendGuestBookPage = function(res, comments) {
+  fs.readFile('private/guest_book.html', (err, data) => {
+    if (err) {
+      send(res, 500, ERROR_500);
+      return;
+    }
+    const commentsHTML = createCommentsHTML(comments);
+    const guestBookPage = data
+      .toString()
+      .replace(COMMENTS_PLACEHOLDER, commentsHTML);
+
+    send(res, 200, guestBookPage);
+  });
 };
 
 const serveGuestBookPage = function(req, res) {
-  fs.readFile('private/comments.part_json', (err, data) => {
-    const commentsData = JSON.parse('[' + data.slice(0, -1) + ']');
-    fs.readFile('private/guest_book.html', (err, data) => {
-      if (err) return send(res, 500, ERROR_500);
-      const commentsOrderedByDate = commentsData.reverse();
-      const commentsHTML = createCommentsHTML(commentsOrderedByDate);
-      const guestBookPage = data
-        .toString()
-        .replace(COMMENTS_PLACEHOLDER, commentsHTML);
-
-      send(res, 200, guestBookPage);
-    });
+  fs.readFile(COMMENTS_FILE, (err, data) => {
+    if (err) {
+      send(res, 500, ERROR_500);
+      return;
+    }
+    const commentsJSON = '[' + data.slice(0, -1) + ']';
+    const comments = JSON.parse(commentsJSON);
+    sendGuestBookPage(res, comments);
   });
 };
 
