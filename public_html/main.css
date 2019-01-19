@@ -1,6 +1,11 @@
 .title {
   text-align: right;
   margin-right: 30px;
+  color: orange;
+}
+
+.center {
+  text-align: center;
 }
 
 .line {
