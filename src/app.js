@@ -9,6 +9,9 @@ const REDIRECTS = { './public_html/': './public_html/index.html' };
 const app = new Sheeghra();
 
 const loadComments = function() {
+  if (!fs.existsSync(COMMENTS_FILE)) {
+    fs.writeFileSync(COMMENTS_FILE, '[]', 'utf-8');
+  }
   const commentsJSON = fs.readFileSync(COMMENTS_FILE, 'utf-8');
   return JSON.parse(commentsJSON);
 };
@@ -113,7 +116,7 @@ const serveGuestBookPage = function(req, res) {
   });
 };
 
-// app.use(logRequests);
+app.use(logRequests);
 app.use(readPostBody);
 app.get('/guest_book', serveGuestBookPage);
 app.post('/guest_book', postComment);
