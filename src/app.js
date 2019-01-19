@@ -65,7 +65,9 @@ const saveComment = function(comment, req, res) {
 const readArgs = text => {
   let args = {};
   const splitKeyValue = pair => pair.split('=');
-  const assignKeyValueToArgs = ([key, value]) => (args[key] = value);
+  const assignKeyValueToArgs = ([key, value]) => {
+    args[key] = unescape(unescape(value));
+  };
   text
     .split('&')
     .map(splitKeyValue)
@@ -111,7 +113,7 @@ const serveGuestBookPage = function(req, res) {
   });
 };
 
-app.use(logRequests);
+// app.use(logRequests);
 app.use(readPostBody);
 app.get('/guest_book', serveGuestBookPage);
 app.post('/guest_book', postComment);

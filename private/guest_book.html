@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Page Title</title>
+    <script src="/guest_book.js"></script>
   </head>
   <body>
     <main>
@@ -10,10 +11,12 @@
       </p>
       <h1>Leave a comment</h1>
       <form action="" method="POST">
-        <label>Name:</label><input type="text" name="name" /><br />
+        <label>Name:</label><input type="text" id="name" /><br />
         <label>Comment:</label>
-        <textarea name="comment" cols="30" rows="10"></textarea><br />
-        <input type="submit" name="submit" value="Submit" /><br />
+        <textarea cols="30" rows="10" id="comment"></textarea><br />
+        <input type="hidden" name="name" id="hiddenName" />
+        <input type="hidden" name="comment" id="hiddenComment" />
+        <input type="submit" id="submit" value="Submit" /><br />
       </form>
     </main>
     <div>######COMMENTS_GOES_HERE######</div>
