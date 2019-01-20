@@ -18,7 +18,8 @@ const MIME_TYPES = {
   jpeg: 'image/jpeg',
   json: 'application/json',
   png: 'image/png',
-  xml: 'text/xml'
+  xml: 'text/xml',
+  pdf: 'application/pdf'
 };
 
 module.exports = {
