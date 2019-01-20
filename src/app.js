@@ -4,15 +4,30 @@ const ERROR_404 = '404: Resource Not Found';
 const ERROR_500 = '500: Internal Server Error';
 const COMMENTS_PLACEHOLDER = '######COMMENTS_GOES_HERE######';
 const COMMENTS_FILE = './private/comments.json';
+const UTF8_ENCODING = 'utf-8';
 const REDIRECTS = { './public_html/': './public_html/index.html' };
+const MIME_TYPES = {
+  css: 'text/css',
+  html: 'text/html',
+  js: 'text/javascript',
+  csv: 'text/csv',
+  gif: 'image/gif',
+  htm: 'text/html',
+  html: 'text/html',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  json: 'application/json',
+  png: 'image/png',
+  xml: 'text/xml'
+};
 
 const app = new Sheeghra();
 
 const loadComments = function() {
   if (!fs.existsSync(COMMENTS_FILE)) {
-    fs.writeFileSync(COMMENTS_FILE, '[]', 'utf-8');
+    fs.writeFileSync(COMMENTS_FILE, '[]', UTF8_ENCODING);
   }
-  const commentsJSON = fs.readFileSync(COMMENTS_FILE, 'utf-8');
+  const commentsJSON = fs.readFileSync(COMMENTS_FILE, UTF8_ENCODING);
   return JSON.parse(commentsJSON);
 };
 
@@ -24,6 +39,14 @@ const resolveRequestedFile = function(url) {
   return REDIRECTS[requestedFile] || requestedFile;
 };
 
+const resolveMIMEType = function(fileExtension) {
+  return MIME_TYPES[fileExtension] || 'text/plain';
+};
+
+const getFileExtension = function(fileName) {
+  return fileName.split('.').pop();
+};
+
 const isFileNotFoundError = function(errorCode) {
   return errorCode == 'ENOENT';
 };
@@ -32,7 +55,9 @@ const serveFile = (req, res, next) => {
   const requestedFile = resolveRequestedFile(req.url);
   fs.readFile(requestedFile, (err, content) => {
     if (!err) {
-      send(res, 200, content);
+      const fileExtension = getFileExtension(requestedFile);
+      const contentType = resolveMIMEType(fileExtension);
+      send(res, 200, content, contentType);
       return;
     }
     if (isFileNotFoundError(err.code)) {
@@ -43,7 +68,8 @@ const serveFile = (req, res, next) => {
   });
 };
 
-const send = function(res, statusCode, content) {
+const send = function(res, statusCode, content, contentType = 'text/plain') {
+  res.setHeader('Content-Type', contentType);
   res.statusCode = statusCode;
   res.write(content);
   res.end();
@@ -116,7 +142,7 @@ const serveGuestBookPage = function(req, res) {
       .toString()
       .replace(COMMENTS_PLACEHOLDER, commentsHTML);
 
-    send(res, 200, guestBookPage);
+    send(res, 200, guestBookPage, resolveMIMEType('html'));
   });
 };
 
