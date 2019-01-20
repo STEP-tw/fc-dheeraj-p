@@ -7,7 +7,20 @@ const encodeFormData = function() {
   commentHiddenFied.value = escape(commentBox.value);
 };
 
+const updateCommentBox = function(content) {
+  const commentBox = document.getElementById('comments');
+  commentBox.innerHTML = content;
+};
+
+const updateComments = function() {
+  string = fetch('/comments')
+    .then(response => response.text())
+    .then(updateCommentBox);
+};
+
 window.onload = function() {
   const submitButton = document.getElementById('submit');
+  const reloadButton = document.getElementById('reload');
   submitButton.onclick = encodeFormData;
+  reloadButton.onclick = updateComments;
 };

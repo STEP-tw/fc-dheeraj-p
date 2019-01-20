@@ -101,6 +101,10 @@ const createCommentsHTML = function(commentsData) {
   return commentsHTML.join('\n');
 };
 
+const serveComments = function(req, res) {
+  send(res, 200, createCommentsHTML(comments));
+};
+
 const serveGuestBookPage = function(req, res) {
   fs.readFile('private/guest_book.html', (err, data) => {
     if (err) {
@@ -118,6 +122,7 @@ const serveGuestBookPage = function(req, res) {
 
 app.use(logRequests);
 app.use(readPostBody);
+app.get('/comments', serveComments);
 app.get('/guest_book', serveGuestBookPage);
 app.post('/guest_book', postComment);
 app.use(serveFile);
