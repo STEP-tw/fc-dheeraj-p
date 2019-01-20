@@ -1,25 +1,16 @@
 const fs = require('fs');
 const Sheeghra = require('./sheeghra');
-const ERROR_404 = '404: Resource Not Found';
-const ERROR_500 = '500: Internal Server Error';
-const COMMENTS_PLACEHOLDER = '######COMMENTS_GOES_HERE######';
-const COMMENTS_FILE = './private/comments.json';
-const UTF8_ENCODING = 'utf-8';
-const REDIRECTS = { './public_html/': './public_html/index.html' };
-const MIME_TYPES = {
-  css: 'text/css',
-  html: 'text/html',
-  js: 'text/javascript',
-  csv: 'text/csv',
-  gif: 'image/gif',
-  htm: 'text/html',
-  html: 'text/html',
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  json: 'application/json',
-  png: 'image/png',
-  xml: 'text/xml'
-};
+const {
+  ERROR_404,
+  ERROR_500,
+  COMMENTS_PLACEHOLDER,
+  COMMENTS_FILE,
+  UTF8_ENCODING,
+  REDIRECTS,
+  MIME_TYPES,
+  GUEST_BOOK_FILE,
+  MIME_TEXT_PLAIN
+} = require('./constants');
 
 const app = new Sheeghra();
 
@@ -40,7 +31,7 @@ const resolveRequestedFile = function(url) {
 };
 
 const resolveMIMEType = function(fileExtension) {
-  return MIME_TYPES[fileExtension] || 'text/plain';
+  return MIME_TYPES[fileExtension] || MIME_TEXT_PLAIN;
 };
 
 const getFileExtension = function(fileName) {
@@ -68,7 +59,7 @@ const serveFile = (req, res, next) => {
   });
 };
 
-const send = function(res, statusCode, content, contentType = 'text/plain') {
+const send = function(res, statusCode, content, contentType = MIME_TEXT_PLAIN) {
   res.setHeader('Content-Type', contentType);
   res.statusCode = statusCode;
   res.write(content);
@@ -132,7 +123,7 @@ const serveComments = function(req, res) {
 };
 
 const serveGuestBookPage = function(req, res) {
-  fs.readFile('private/guest_book.html', (err, data) => {
+  fs.readFile(GUEST_BOOK_FILE, (err, data) => {
     if (err) {
       send(res, 500, ERROR_500);
       return;
