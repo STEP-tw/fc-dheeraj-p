@@ -13,7 +13,7 @@ const updateCommentBox = function(content) {
 };
 
 const updateComments = function() {
-  string = fetch('/comments')
+  fetch('/comments')
     .then(response => response.text())
     .then(updateCommentBox);
 };
