@@ -7,14 +7,21 @@ const encodeFormData = function() {
   commentHiddenFied.value = escape(commentBox.value);
 };
 
-const updateCommentBox = function(content) {
+const createCommentsHTML = function(comments) {
+  const commentsHTML = comments.map(({ date, name, comment }) => {
+    return `<p>${date}: <strong>${name}</strong> : ${comment}</p>`;
+  });
+  return commentsHTML.join('\n');
+};
+
+const updateCommentBox = function(comments) {
   const commentBox = document.getElementById('comments');
-  commentBox.innerHTML = content;
+  commentBox.innerHTML = createCommentsHTML(comments);
 };
 
 const updateComments = function() {
   fetch('/comments')
-    .then(response => response.text())
+    .then(response => response.json())
     .then(updateCommentBox);
 };
 

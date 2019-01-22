@@ -112,15 +112,8 @@ const postComment = function(req, res, next) {
   saveComment(comment, res, next);
 };
 
-const createCommentsHTML = function(commentsData) {
-  const commentsHTML = commentsData.map(({ date, name, comment }) => {
-    return `<p>${date}: <strong>${name}</strong> : ${comment}</p>`;
-  });
-  return commentsHTML.join('\n');
-};
-
 const serveComments = function(req, res) {
-  send(res, 200, createCommentsHTML(comments));
+  send(res, 200, JSON.stringify(comments), resolveMIMEType('json'));
 };
 
 app.use(logRequests);
