@@ -9,7 +9,8 @@ const encodeFormData = function() {
 
 const createCommentsHTML = function(comments) {
   const commentsHTML = comments.map(({ date, name, comment }) => {
-    return `<p>${date}: <strong>${name}</strong> : ${comment}</p>`;
+    const localeDate = new Date(date).toLocaleString();
+    return `<p>${localeDate}: <strong>${name}</strong> : ${comment}</p>`;
   });
   return commentsHTML.join('\n');
 };

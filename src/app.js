@@ -107,8 +107,7 @@ const readPostBody = (req, res, next) => {
 
 const postComment = function(req, res, next) {
   const comment = readArgs(req.body);
-  const date = new Date().toLocaleString();
-  comment.date = date;
+  comment.date = new Date();
   saveComment(comment, res, next);
 };
 
