@@ -13,6 +13,9 @@ const {
 const app = new Sheeghra();
 
 const loadComments = function() {
+  if (!fs.existsSync('./private')) {
+    fs.mkdirSync('./private');
+  }
   if (!fs.existsSync(COMMENTS_FILE)) {
     fs.writeFileSync(COMMENTS_FILE, '[]', UTF8_ENCODING);
   }
