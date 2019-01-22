@@ -3,12 +3,10 @@ const Sheeghra = require('./sheeghra');
 const {
   ERROR_404,
   ERROR_500,
-  COMMENTS_PLACEHOLDER,
   COMMENTS_FILE,
   UTF8_ENCODING,
   REDIRECTS,
   MIME_TYPES,
-  GUEST_BOOK_FILE,
   MIME_TEXT_PLAIN
 } = require('./constants');
 
@@ -72,13 +70,13 @@ const logRequests = function(req, res, next) {
   next();
 };
 
-const saveComment = function(comment, req, res) {
+const saveComment = function(comment, res, next) {
   comments.unshift(comment);
   fs.writeFile(COMMENTS_FILE, JSON.stringify(comments), err => {
     if (err) {
       return send(res, 500, ERROR_500);
     }
-    serveGuestBookPage(req, res);
+    next();
   });
 };
 
@@ -104,11 +102,11 @@ const readPostBody = (req, res, next) => {
   });
 };
 
-const postComment = function(req, res) {
+const postComment = function(req, res, next) {
   const comment = readArgs(req.body);
   const date = new Date().toLocaleString();
   comment.date = date;
-  saveComment(comment, req, res);
+  saveComment(comment, res, next);
 };
 
 const createCommentsHTML = function(commentsData) {
@@ -122,26 +120,10 @@ const serveComments = function(req, res) {
   send(res, 200, createCommentsHTML(comments));
 };
 
-const serveGuestBookPage = function(req, res) {
-  fs.readFile(GUEST_BOOK_FILE, (err, data) => {
-    if (err) {
-      send(res, 500, ERROR_500);
-      return;
-    }
-    const commentsHTML = createCommentsHTML(comments);
-    const guestBookPage = data
-      .toString()
-      .replace(COMMENTS_PLACEHOLDER, commentsHTML);
-
-    send(res, 200, guestBookPage, resolveMIMEType('html'));
-  });
-};
-
 app.use(logRequests);
 app.use(readPostBody);
 app.get('/comments', serveComments);
-app.get('/guest_book', serveGuestBookPage);
-app.post('/guest_book', postComment);
+app.post('/guest_book.html', postComment);
 app.use(serveFile);
 
 // Export a function that can act as a handler

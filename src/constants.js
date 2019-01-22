@@ -1,8 +1,6 @@
 const ERROR_404 = '404: Resource Not Found';
 const ERROR_500 = '500: Internal Server Error';
-const COMMENTS_PLACEHOLDER = '######COMMENTS_GOES_HERE######';
 const COMMENTS_FILE = './private/comments.json';
-const GUEST_BOOK_FILE = 'private/guest_book.html';
 const UTF8_ENCODING = 'utf-8';
 const REDIRECTS = { './public_html/': './public_html/index.html' };
 const MIME_TEXT_PLAIN = 'text/plain';
@@ -25,11 +23,9 @@ const MIME_TYPES = {
 module.exports = {
   ERROR_404,
   ERROR_500,
-  COMMENTS_PLACEHOLDER,
   COMMENTS_FILE,
   UTF8_ENCODING,
   REDIRECTS,
   MIME_TYPES,
-  GUEST_BOOK_FILE,
   MIME_TEXT_PLAIN
 };

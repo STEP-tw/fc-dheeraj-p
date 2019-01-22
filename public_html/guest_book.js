@@ -23,4 +23,5 @@ window.onload = function() {
   const reloadButton = document.getElementById('reload');
   submitButton.onclick = encodeFormData;
   reloadButton.onclick = updateComments;
+  updateComments();
 };
