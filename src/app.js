@@ -83,17 +83,18 @@ const saveComment = function(comment, res, next) {
   });
 };
 
-const readArgs = text => {
-  let args = {};
-  const splitKeyValue = pair => pair.split('=');
-  const assignKeyValueToArgs = ([key, value]) => {
-    args[key] = unescape(unescape(value));
-  };
-  text
+const splitKeyValue = pair => pair.split('=');
+
+const assignKeyValue = (parameters, [key, value]) => {
+  parameters[key] = unescape(unescape(value));
+  return parameters;
+};
+
+const readParameters = requestBody => {
+  return requestBody
     .split('&')
     .map(splitKeyValue)
-    .forEach(assignKeyValueToArgs);
-  return args;
+    .reduce(assignKeyValue, {});
 };
 
 const readPostBody = (req, res, next) => {
@@ -106,7 +107,7 @@ const readPostBody = (req, res, next) => {
 };
 
 const postComment = function(req, res, next) {
-  const comment = readArgs(req.body);
+  const comment = readParameters(req.body);
   comment.date = new Date();
   saveComment(comment, res, next);
 };
