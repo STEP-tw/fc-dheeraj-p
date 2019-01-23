@@ -11,7 +11,8 @@ const {
   LOGIN_FORM_TEMPLATE_PATH,
   COMMENT_FORM_TEMPLATE_PATH,
   FORM_PLACEHOLDER,
-  GUEST_BOOK_PAGE_TEMPLATE_PATH
+  GUEST_BOOK_PAGE_TEMPLATE_PATH,
+  USERNAME_PLACEHOLDER
 } = require('./constants');
 
 const app = new Sheeghra();
@@ -111,7 +112,9 @@ const readPostBody = (req, res, next) => {
 };
 
 const postComment = function(req, res, next) {
+  const { username } = readCookies(req.headers.cookie);
   const comment = readParameters(req.body);
+  comment.name = username;
   comment.date = new Date();
   saveComment(req, res, comment);
 };
@@ -129,8 +132,7 @@ const readCookies = function(cookieHeader) {
     .reduce(assignKeyValue, {});
 };
 
-const isUserLoggedIn = function(req) {
-  const cookieHeader = req.headers.cookie;
+const isUserLoggedIn = function(cookieHeader) {
   if (!cookieHeader) {
     return false;
   }
@@ -151,8 +153,10 @@ const GUEST_BOOK_TEMPLATE = fs.readFileSync(
   UTF8_ENCODING
 );
 
-const getCommentsFormPage = function() {
-  return GUEST_BOOK_TEMPLATE.replace(FORM_PLACEHOLDER, COMMENT_FORM_HTML);
+const getCommentsFormPage = function(username) {
+  return GUEST_BOOK_TEMPLATE
+    .replace(FORM_PLACEHOLDER, COMMENT_FORM_HTML)
+    .replace(USERNAME_PLACEHOLDER, username);
 };
 
 const getLoginFormPage = function() {
@@ -161,8 +165,9 @@ const getLoginFormPage = function() {
 
 const serveGuestBookPage = function(req, res, next) {
   let guestBookPageHTML = getLoginFormPage();
-  if (isUserLoggedIn(req)) {
-    guestBookPageHTML = getCommentsFormPage();
+  if (isUserLoggedIn(req.headers.cookie)) {
+    const { username } = readCookies(req.headers.cookie);
+    guestBookPageHTML = getCommentsFormPage(username);
   }
   send(res, 200, guestBookPageHTML, resolveMIMEType('html'));
 };
@@ -176,12 +181,20 @@ const doLogin = function(req, res) {
   res.end();
 };
 
+const doLogout = function(req, res){
+  res.setHeader('Set-Cookie', `username=deleted; expires=Thu, Jan 01 1970 00:00:00 UTC;`);
+  res.statusCode = 302;
+  res.setHeader('location', '/guest_book.html');
+  res.end();
+}
+
 app.use(logRequests);
 app.use(readPostBody);
 app.get('/comments', serveComments);
 app.get('/guest_book.html', serveGuestBookPage);
 app.post('/guest_book.html', postComment);
 app.post('/login', doLogin);
+app.post('/logout', doLogout);
 app.use(serveFile);
 
 // Export a function that can act as a handler
